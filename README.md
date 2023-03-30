@@ -20,9 +20,9 @@ PHP >= 7.1
    composer require cccyun/alipay-sdk
    ```
 
-2. 创建配置文件 [`config.php`](./blob/main/examples/config.php)，填写配置信息。
+2. 创建配置文件 [`config.php`](./examples/config.php)，填写配置信息。
 
-3. 引入配置文件，构造请求参数，调用AlipayTradeService中的方法发起请求，参考 [`examples/qrpay.php`](./blob/main/examples/qrpay.php)
+3. 引入配置文件，构造请求参数，调用AlipayTradeService中的方法发起请求，参考 [`examples/qrpay.php`](./examples/qrpay.php)
 
 4. 更多实例，请移步 [`examples`](examples/) 目录。
 
@@ -39,7 +39,7 @@ PHP >= 7.1
    | AlipayCertdocService  | 支付宝实名证件信息比对验证                               |
    | AlipayBillService     | 支付宝账单功能                                           |
 
-6. 要对接的API在AlipayService实现类中没有，可根据支付宝官方的文档，使用AlipayService类中的aopExecute方法直接调用接口，参考 [`examples/other.php`](./blob/main/examples/other.php)
+6. 要对接的API在AlipayService实现类中没有，可根据支付宝官方的文档，使用AlipayService类中的aopExecute方法直接调用接口，参考 [`examples/other.php`](./examples/other.php)
 
    
 

@@ -4,6 +4,9 @@
  * 使用\Alipay\AlipayService中的aopExecute方法调用自定义接口
  */
 
+require __DIR__.'/../vendor/autoload.php';
+@header('Content-Type: text/html; charset=UTF-8');
+
 $alipay_config = require('config.php');
 $aop = new \Alipay\AlipayService($alipay_config);
 

@@ -83,7 +83,10 @@ class AlipayResponse
         $this->nodeName = $nodeName;
 
         $signDataStartIndex = $nodeIndex + strlen($nodeName) + 2;
-        $signIndex = strrpos($this->raw, '"'.static::SIGN_NODE.'"');
+        $signIndex = strrpos($this->raw, '"'.static::ALIPAY_CERT_SN.'"');
+        if(!$signIndex) {
+            $signIndex = strrpos($this->raw, '"'.static::SIGN_NODE.'"');
+        }
 
         $signDataEndIndex = $signIndex - 1;
         $indexLen = $signDataEndIndex - $signDataStartIndex;

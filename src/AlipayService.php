@@ -49,7 +49,7 @@ class AlipayService
             throw new \InvalidArgumentException("支付宝公钥不能为空");
         }
         $this->appId = $config['app_id'];
-        if (!empty($config['app_cert_path']) && !empty($config['alipay_cert_path']) && !empty($config['root_cert_path'])) {
+        if (!empty($config['app_cert_path']) && !empty($config['alipay_cert_path']) && !empty($config['root_cert_path']) && (!isset($config['cert_mode']) || $config['cert_mode'] == 1)) {
             $this->isCertMode = true;
         }
         if (isset($config['app_auth_token'])) {

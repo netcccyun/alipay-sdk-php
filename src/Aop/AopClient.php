@@ -128,7 +128,35 @@ class AopClient
     {
         $params = $this->build($request);
 
-        if (strtoupper($httpmethod) == 'GET') {
+        if (strtoupper($httpmethod) == 'REDIRECT') {
+            $requestUrl = $this->gatewayUrl.'?'.http_build_query($params);
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $requestUrl);
+            curl_setopt($ch, CURLOPT_FAILONERROR, false);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            $response = curl_exec($ch);
+            if (curl_errno($ch) > 0) {
+                $errmsg = curl_error($ch);
+                curl_close($ch);
+                throw new \Exception($errmsg, 0);
+            }
+            $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            if ($httpStatusCode == 301 || $httpStatusCode == 302) {
+                $redirect_url = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+                return $redirect_url;
+            } elseif ($httpStatusCode == 200) {
+                $response = mb_convert_encoding($response, 'UTF-8', 'GB2312');
+                if(preg_match('/<div\s+class="Todo">([^<]+)<\/div>/i', $response, $matchers)) {
+                    throw new \Exception($matchers[1]);
+                }
+            }
+            throw new \Exception('返回数据解析失败', $httpStatusCode);
+
+        } elseif (strtoupper($httpmethod) == 'GET') {
             $requestUrl = $this->gatewayUrl.'?'.http_build_query($params);
             return $requestUrl;
         } else {

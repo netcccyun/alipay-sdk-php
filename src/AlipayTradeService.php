@@ -215,8 +215,10 @@ class AlipayTradeService extends AlipayService
         $bizContent['settle_info'] = [
             'settle_period_time' => $settle_period_time,
             'settle_detail_infos' => [
-                'trans_in_type' => 'defaultSettle',
-                'amount' => $bizContent['total_amount']
+                [
+                    'trans_in_type' => 'defaultSettle',
+                    'amount' => $bizContent['total_amount']
+                ]
             ]
         ];
     }

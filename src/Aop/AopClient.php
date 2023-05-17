@@ -348,14 +348,13 @@ class AopClient
     protected function rsaPrivateSign($data, $signType = 'RSA2')
     {
         if ($this->isEmpty($this->rsaPrivateKeyFilePath)) {
-            $priKey = $this->rsaPrivateKey;
-            $res = "-----BEGIN RSA PRIVATE KEY-----\n" .
-                wordwrap($priKey, 64, "\n", true) .
+            $priKey = "-----BEGIN RSA PRIVATE KEY-----\n" .
+                wordwrap($this->rsaPrivateKey, 64, "\n", true) .
                 "\n-----END RSA PRIVATE KEY-----";
         } else {
             $priKey = file_get_contents($this->rsaPrivateKeyFilePath);
-            $res = openssl_get_privatekey($priKey);
         }
+        $res = openssl_get_privatekey($priKey);
         if(!$res){
             throw new \Exception('签名失败，应用私钥不正确');
         }
@@ -381,14 +380,13 @@ class AopClient
     protected function rsaPubilcVerify($data, $sign, $signType = 'RSA2')
     {
         if ($this->isEmpty($this->rsaPublicKeyFilePath)) {
-            $pubKey = $this->rsaPublicKey;
-            $res = "-----BEGIN PUBLIC KEY-----\n" .
-                wordwrap($pubKey, 64, "\n", true) .
+            $pubKey = "-----BEGIN PUBLIC KEY-----\n" .
+                wordwrap($this->rsaPublicKey, 64, "\n", true) .
                 "\n-----END PUBLIC KEY-----";
         } else {
             $pubKey = file_get_contents($this->rsaPublicKeyFilePath);
-            $res = openssl_get_publickey($pubKey);
         }
+        $res = openssl_get_publickey($pubKey);
         if(!$res){
             throw new \Exception('验签失败，支付宝公钥不正确');
         }

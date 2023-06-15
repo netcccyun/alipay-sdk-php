@@ -13,6 +13,7 @@ class AlipayOauthService extends AlipayService
      */
     public function __construct($config)
     {
+        if(isset($config['app_auth_token'])) unset($config['app_auth_token']);
         parent::__construct($config);
     }
 

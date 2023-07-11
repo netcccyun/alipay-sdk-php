@@ -7,12 +7,18 @@ namespace Alipay;
  */
 class AlipayTradeService extends AlipayService
 {
+    //互联网直付通模式子商户ID
+    private $smid;
+
     /**
      * @param $config 支付宝配置信息
      */
     public function __construct($config)
     {
         parent::__construct($config);
+        if (isset($config['smid'])) {
+            $this->smid = $config['smid'];
+        }
         if (isset($config['notify_url'])) {
             $this->notifyUrl = $config['notify_url'];
         }

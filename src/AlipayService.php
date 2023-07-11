@@ -27,11 +27,11 @@ class AlipayService
     //服务商模式子商户token
     protected $appAuthToken;
 
-    //互联网直付通模式子商户ID
-    protected $smid;
-
     //日志文件夹路径
     protected $logPath;
+
+    //页面跳转接口返回类型
+    protected $pageMethod;
 
     /**
      * @param $config 支付宝配置信息
@@ -55,11 +55,11 @@ class AlipayService
         if (isset($config['app_auth_token'])) {
             $this->appAuthToken = $config['app_auth_token'];
         }
-        if (isset($config['smid'])) {
-            $this->smid = $config['smid'];
-        }
         if (isset($config['logPath'])) {
             $this->logPath = $config['logPath'];
+        }
+        if (isset($config['pageMethod'])) {
+            $this->pageMethod = $config['pageMethod'];
         }
 
         $this->client = new AopClient();
@@ -133,7 +133,16 @@ class AlipayService
         if (is_array($params) && count($params) > 0) {
             $request->setOtherParams($params);
         }
-        return $this->client->pageExecute($request);
+        if (!empty($this->pageMethod)) {
+            switch($this->pageMethod) {
+                case '2':$httpmethod = 'REDIRECT';break;
+                case '1':$httpmethod = 'GET';break;
+                default:$httpmethod = 'POST';break;
+            }
+            return $this->client->pageExecute($request, $httpmethod);
+        } else {
+            return $this->client->pageExecute($request);
+        }
     }
 
     /**

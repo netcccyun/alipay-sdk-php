@@ -35,6 +35,11 @@ $bizContent = [
     'total_amount' => '0.15', //订单金额，单位为元
     'subject' => 'sample subject', //商品的标题
 ];
+if(!empty($result['user_id'])){
+    $bizContent['buyer_id'] = $result['user_id'];
+}else{
+    $bizContent['buyer_open_id'] = $result['open_id'];
+}
 
 //发起支付请求
 try{

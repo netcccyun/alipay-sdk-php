@@ -16,7 +16,7 @@ if($aop->check($_POST)) {//验证成功
     $trade_no = $_POST['trade_no'];
 
     //买家支付宝用户ID
-    $buyer_id = $_POST['buyer_id'];
+    $buyer_id = !empty($_POST['buyer_id']) ? $_POST['buyer_id'] : $_POST['buyer_open_id'];
 
     //交易金额
     $total_amount = $_POST['total_amount'];

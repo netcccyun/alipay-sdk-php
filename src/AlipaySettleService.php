@@ -18,7 +18,7 @@ class AlipaySettleService extends AlipayService
 
     /**
      * 分账关系绑定
-     * @param $type 分账接收方方类型(userId,loginName)
+     * @param $type 分账接收方方类型(userId,loginName,openId)
      * @param $account 分账接收方账号
      * @param $name 分账接收方真实姓名
      * @return bool
@@ -43,7 +43,7 @@ class AlipaySettleService extends AlipayService
 
     /**
      * 分账关系解绑
-     * @param $type 分账接收方方类型(userId,loginName)
+     * @param $type 分账接收方方类型(userId,loginName,openId)
      * @param $account 分账接收方账号
      * @return bool
      */
@@ -85,7 +85,7 @@ class AlipaySettleService extends AlipayService
     /**
      * 分账请求
      * @param $trade_no 支付宝订单号
-     * @param $type 收入方账户类型(userId,cardAliasNo,loginName)
+     * @param $type 收入方账户类型(userId,cardAliasNo,loginName,openId)
      * @param $account 收入方账户
      * @param $money 分账的金额
      * @return mixed {"trade_no":"支付宝交易号","settle_no":"支付宝分账单号"}

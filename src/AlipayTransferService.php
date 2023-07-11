@@ -20,7 +20,7 @@ class AlipayTransferService extends AlipayService
      * 转账到支付宝账号
      * @param $out_biz_no 商户转账唯一订单号
      * @param $amount 转账金额
-     * @param $is_userid 收款方是否支付宝userid
+     * @param $is_userid 收款方是否支付宝userid（0支付宝账号,1支付宝UID,2支付宝openid）
      * @param $payee_account 收款方账户
      * @param $payee_real_name 收款方姓名
      * @param $payer_show_name 付款方显示姓名
@@ -30,7 +30,11 @@ class AlipayTransferService extends AlipayService
     {
         if ($this->isCertMode) {
             $apiName = 'alipay.fund.trans.uni.transfer';
-            $payee_type = $is_userid?'ALIPAY_USER_ID':'ALIPAY_LOGON_ID';
+            switch($is_userid) {
+                case 2:$payee_type = 'ALIPAY_OPEN_ID';break;
+                case 1:$payee_type = 'ALIPAY_USER_ID';break;
+                default:$payee_type = 'ALIPAY_LOGON_ID';break;
+            }
             $bizContent = [
                 'out_biz_no' => $out_biz_no, //商户转账唯一订单号
                 'trans_amount' => $amount, //转账金额
@@ -114,15 +118,23 @@ class AlipayTransferService extends AlipayService
     /**
      * 账户余额查询
      * @param $alipay_user_id 支付宝用户ID
+     * @param $user_type 用户标识类型（0支付宝UID,1支付宝openid）
      * @return mixed {"available_amount":"账户可用余额","freeze_amount":"实时冻结余额"}
      */
-    public function accountQuery($alipay_user_id)
+    public function accountQuery($alipay_user_id, $user_type = 0)
     {
         $apiName = 'alipay.fund.account.query';
-        $bizContent = array(
-            'alipay_user_id' => $alipay_user_id,
-            'account_type' => 'ACCTRANS_ACCOUNT',
-        );
+        if($user_type == 1){
+            $bizContent = [
+                'alipay_open_id' => $alipay_user_id,
+                'account_type' => 'ACCTRANS_ACCOUNT',
+            ];
+        }else{
+            $bizContent = [
+                'alipay_user_id' => $alipay_user_id,
+                'account_type' => 'ACCTRANS_ACCOUNT',
+            ];
+        }
         return $this->aopExecute($apiName, $bizContent);
     }
 

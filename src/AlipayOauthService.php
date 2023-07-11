@@ -21,16 +21,18 @@ class AlipayOauthService extends AlipayService
      * 跳转支付宝授权页面
      * @param $redirect_uri 回调地址
      * @param $state
+     * @param $scope
      * @param $is_get_url 是否只返回url
      * @return void|string
      */
-    public function oauth($redirect_uri, $state = null, $is_get_url = false)
+    public function oauth($redirect_uri, $state = null, $scope = null, $is_get_url = false)
     {
         $param = [
             'app_id' => $this->appId,
             'scope' => 'auth_base',
             'redirect_uri' => $redirect_uri,
         ];
+        if($scope) $param['scope'] = $scope;
         if($state) $param['state'] = $state;
 
         $url = 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?'.http_build_query($param);

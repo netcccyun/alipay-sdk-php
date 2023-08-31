@@ -21,18 +21,16 @@ class AlipayOauthService extends AlipayService
      * 跳转支付宝授权页面
      * @param $redirect_uri 回调地址
      * @param $state
-     * @param $scope
      * @param $is_get_url 是否只返回url
      * @return void|string
      */
-    public function oauth($redirect_uri, $state = null, $scope = null, $is_get_url = false)
+    public function oauth($redirect_uri, $state = null, $is_get_url = false)
     {
         $param = [
             'app_id' => $this->appId,
             'scope' => 'auth_base',
             'redirect_uri' => $redirect_uri,
         ];
-        if($scope) $param['scope'] = $scope;
         if($state) $param['state'] = $state;
 
         $url = 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm?'.http_build_query($param);
@@ -103,6 +101,33 @@ class AlipayOauthService extends AlipayService
 
         header("Location: $url");
         exit();
+    }
+
+    /**
+     * 跳转支付宝指定应用授权页面
+     * @param $redirect_uri 回调地址
+     * @param $app_types 对商家应用的限制类型
+     * @param $state
+     * @return mixed
+     */
+    public function appOauthAssign($redirect_uri, $app_types, $state = null)
+    {
+        $param = [
+            'platformCode' => 'O',
+            'taskType' => 'INTERFACE_AUTH',
+            'agentOpParam' => [
+                'redirectUri' => $redirect_uri,
+                'appTypes' => $app_types,
+                'isvAppId' => $this->appId,
+                'state' => $state
+            ],
+        ];
+
+        $biz_data = json_encode($param, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
+        $pc_url = 'https://b.alipay.com/page/message/tasksDetail?bizData='.rawurlencode($biz_data);
+        $app_url = 'alipays://platformapi/startapp?appId=2021003130652097&page=pages%2Fauthorize%2Findex%3FbizData%3D'.rawurlencode($biz_data);
+
+        return [$pc_url, $app_url];
     }
 
     /**

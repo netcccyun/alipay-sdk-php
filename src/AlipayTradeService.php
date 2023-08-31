@@ -290,4 +290,60 @@ class AlipayTradeService extends AlipayService
         $apiName = 'alipay.trade.app.merge.pay';
         return $this->aopSdkExecute($apiName, $bizContent);
     }
+
+    /**
+     * 线上资金授权冻结
+     * @param $bizContent 请求参数的集合
+     * @return string SDK请求串
+     * @see https://opendocs.alipay.com/open/repo-0243e2
+     */
+    public function preAuthFreeze($bizContent)
+    {
+        $apiName = 'alipay.fund.auth.order.app.freeze';
+        return $this->aopSdkExecute($apiName, $bizContent);
+    }
+
+    /**
+     * 资金授权解冻
+     * @param $bizContent 请求参数的集合
+     * @return mixed
+     */
+    public function preAuthUnfreeze($bizContent)
+    {
+        $apiName = 'alipay.fund.auth.order.unfreeze';
+        return $this->aopExecute($apiName, $bizContent);
+    }
+
+    /**
+     * 资金授权撤销
+     * @param $bizContent 请求参数的集合
+     * @return mixed
+     */
+    public function preAuthCancel($bizContent)
+    {
+        $apiName = 'alipay.fund.auth.operation.cancel';
+        return $this->aopExecute($apiName, $bizContent);
+    }
+
+    /**
+     * 资金授权操作查询接口
+     * @param $bizContent 请求参数的集合
+     * @return mixed
+     */
+    public function preAuthQuery($bizContent)
+    {
+        $apiName = 'alipay.fund.auth.operation.detail.query';
+        return $this->aopExecute($apiName, $bizContent);
+    }
+
+    /**
+     * 资金转账页面支付接口
+     * @param $bizContent 请求参数的集合
+     * @return mixed
+     */
+    public function transPagePay($bizContent)
+    {
+        $apiName = 'alipay.fund.trans.page.pay';
+        return $this->aopPageExecute($apiName, $bizContent);
+    }
 }

@@ -103,14 +103,16 @@ class AlipayTransferService extends AlipayService
     {
         $apiName = 'alipay.fund.trans.common.query';
         $bizContent = [];
-        $bizContent['product_code'] = $code == 1 ? 'TRANS_BANKCARD_NO_PWD' : 'TRANS_ACCOUNT_NO_PWD';
-        $bizContent['biz_scene'] = 'DIRECT_TRANSFER';
         if($type==1){
             $bizContent['pay_fund_order_id'] = $order_id;
         }elseif($type==2){
             $bizContent['out_biz_no'] = $order_id;
         }else{
             $bizContent['order_id'] = $order_id;
+        }
+        if($type==2){
+            $bizContent['product_code'] = $code == 1 ? 'TRANS_BANKCARD_NO_PWD' : 'TRANS_ACCOUNT_NO_PWD';
+            $bizContent['biz_scene'] = 'DIRECT_TRANSFER';
         }
         return $this->aopExecute($apiName, $bizContent);
     }
@@ -138,5 +140,31 @@ class AlipayTransferService extends AlipayService
         return $this->aopExecute($apiName, $bizContent);
     }
 
+    /**
+     * 现金红包转账接口
+     * @param $out_biz_no 商户转账唯一订单号
+     * @param $amount 转账金额
+     * @param $user_id 收款方账户
+     * @param $order_title 转账业务的标题
+     * @param $original_order_id 原支付宝业务单号
+     * @return mixed {"out_biz_no":"商户订单号","order_id":"支付宝转账订单号","pay_fund_order_id":"支付宝支付资金流水号","status":"SUCCESS","trans_date":"订单支付时间"}
+     */
+    public function redPacketTansfer($out_biz_no, $amount, $user_id, $order_title, $original_order_id = null)
+    {
+        $apiName = 'alipay.fund.trans.uni.transfer';
+        $bizContent = [
+            'out_biz_no' => $out_biz_no,
+            'trans_amount' => $amount,
+            'product_code' => 'STD_RED_PACKET',
+            'biz_scene' => 'PERSONAL_COLLECTION',
+            'order_title' => $order_title,
+            'payee_info' => array('identity' => $user_id, 'identity_type' => 'ALIPAY_USER_ID'),
+            'business_params' => json_encode(['sub_biz_scene'=>'REDPACKET'], JSON_UNESCAPED_UNICODE)
+        ];
+        if($original_order_id) $bizContent['original_order_id'] = $original_order_id;
+    
+        $result = $this->aopExecute($apiName, $bizContent);
+        return $result;
+    }
 
 }

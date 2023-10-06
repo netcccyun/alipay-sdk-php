@@ -215,7 +215,7 @@ class AopClient
         $sysParams = array_merge($sysParams, get_object_vars($request));
         // 转换可能是数组的参数
         foreach ($sysParams as $key => &$param) {
-            if (is_array($param) || is_object($param)) {
+            if (is_array($param) || is_object($param) && !$param instanceof \CURLFile) {
                 $param = json_encode($param, JSON_UNESCAPED_UNICODE);
             }
             if (is_null($param)) {
@@ -327,7 +327,7 @@ class AopClient
 
         $stringToBeSigned = "";
         foreach ($params as $k => $v) {
-            if($this->isEmpty($v) || substr($v, 0, 1) == '@') continue;
+            if($v instanceof \CURLFile || $this->isEmpty($v) || substr($v, 0, 1) == '@') continue;
             $stringToBeSigned .= "&{$k}={$v}";
         }
         $stringToBeSigned = substr($stringToBeSigned, 1);
@@ -435,7 +435,9 @@ class AopClient
         if (is_array($postFields) && 0 < count($postFields)) {
             $postMultipart = false;
             foreach ($postFields as &$value) {
-                if(substr($value, 0, 1) == '@' && class_exists('CURLFile')){
+                if ($value instanceof \CURLFile) {
+                    $postMultipart = true;
+                } elseif(substr($value, 0, 1) == '@' && class_exists('CURLFile')) {
                     $postMultipart = true;
                     $file = substr($value, 1);
                     if(file_exists($file)){

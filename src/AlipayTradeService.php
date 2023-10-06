@@ -130,7 +130,7 @@ class AlipayTradeService extends AlipayService
     {
         $result = $this->query($trade_no, $out_trade_no);
         if (isset($result['code']) && $result['code'] == '10000') {
-            if ($result['trade_status'] == 'TRADE_SUCCESS' || $result['trade_status'] == 'TRADE_FINISHED') {
+            if ($result['trade_status'] == 'TRADE_SUCCESS' || $result['trade_status'] == 'TRADE_FINISHED' || $result['trade_status'] == 'TRADE_CLOSED') {
                 return true;
             }
         }
@@ -345,5 +345,16 @@ class AlipayTradeService extends AlipayService
     {
         $apiName = 'alipay.fund.trans.page.pay';
         return $this->aopPageExecute($apiName, $bizContent);
+    }
+
+    /**
+     * 现金红包无线支付接口
+     * @param $bizContent 请求参数的集合
+     * @return mixed
+     */
+    public function transAppPay($bizContent)
+    {
+        $apiName = 'alipay.fund.trans.app.pay';
+        return $this->aopSdkExecute($apiName, $bizContent);
     }
 }

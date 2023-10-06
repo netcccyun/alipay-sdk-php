@@ -167,4 +167,24 @@ class AlipayTransferService extends AlipayService
         return $result;
     }
 
+    /**
+     * 红包资金退回接口
+     * @param $out_request_no 标识一次资金退回请求
+     * @param $order_id 发红包时支付宝返回的支付宝订单号
+     * @param $refund_amount 需要退款的金额
+     * @return mixed {"refund_order_id":"退款的支付宝系统内部单据id","order_id":"发红包时支付宝返回的支付宝订单号","out_request_no":"标识一次资金退回请求","status":"SUCCESS","refund_amount":"本次退款的金额","refund_date":"时间"}
+     */
+    public function redPacketRefund($out_request_no, $order_id, $refund_amount)
+    {
+        $apiName = 'alipay.fund.trans.refund';
+        $bizContent = [
+            'order_id' => $order_id,
+            'out_request_no' => $out_request_no,
+            'refund_amount' => $refund_amount,
+        ];
+    
+        $result = $this->aopExecute($apiName, $bizContent);
+        return $result;
+    }
+
 }

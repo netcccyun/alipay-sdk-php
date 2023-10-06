@@ -51,18 +51,20 @@ class AlipayComplainService extends AlipayService
 
     /**
      * 商户上传处理图片
-     * @param $image_type 图片格式，支持格式：jpg、jpeg、png
-     * @param $image_path 图片文件路径
+     * @param $file_path 文件路径
+     * @param $file_name 文件名
      * @return string 图片资源标识
      */
-    public function imageUpload($image_type, $image_path)
+    public function imageUpload($file_path, $file_name)
     {
+        $image_type = array_pop(explode('.',$file_name));
+        if (empty($image_type)) $image_type = 'png';
         $apiName = 'alipay.merchant.image.upload';
-        $bizContent = [
+        $params = [
             'image_type' => $image_type,
-            'image_content' => '@'.$image_path,
+            'image_content' => new \CURLFile($file_path, '', $file_name),
         ];
-        $result = $this->aopExecute($apiName, $bizContent);
+        $result = $this->aopExecute($apiName, null, $params);
         return $result['image_id'];
     }
 

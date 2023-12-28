@@ -5,6 +5,7 @@ namespace Alipay;
 /**
  * 支付宝交易投诉处理类
  * @see https://opendocs.alipay.com/open/02z18r
+ * @see https://opendocs.alipay.com/pre-open/repo-02ei7s
  */
 class AlipayComplainService extends AlipayService
 {
@@ -125,6 +126,80 @@ class AlipayComplainService extends AlipayService
         if ($supplement_images) $bizContent['supplement_images'] = $supplement_images;
         $this->aopExecute($apiName, $bizContent);
         return true;
+    }
+
+
+    /**
+     * RiskGO查询单条交易投诉详情
+     * @param $complain_id 支付宝侧投诉单号
+     * @return mixed
+     */
+    public function riskquery($complain_id)
+    {
+        $apiName = 'alipay.security.risk.complaint.info.query';
+        $bizContent = [
+            'complain_id' => $complain_id,
+        ];
+        return $this->aopExecute($apiName, $bizContent);
+    }
+
+    /**
+     * RiskGO查询交易投诉列表
+     * @param $status 状态
+     * @param $begin_time 查询开始时间
+     * @param $end_time 查询结束时间
+     * @param $page_num 当前页
+     * @param $page_size 每页条数,最多支持20条
+     * @return mixed {"page_size":10,"page_num":1,"total_page_num":5,"total_num":55,"trade_complain_infos":[]}
+     */
+    public function riskbatchQuery($status = null, $begin_time = null, $end_time = null, $page_num = 1, $page_size = 10)
+    {
+        $apiName = 'alipay.security.risk.complaint.info.batchquery';
+        $bizContent = [
+            'current_page_num' => $page_num,
+            'page_size' => $page_size,
+        ];
+        if ($status) $bizContent['status_list'] = [$status];
+        if ($begin_time) $bizContent['begin_time'] = $begin_time;
+        if ($end_time) $bizContent['end_time'] = $end_time;
+        return $this->aopExecute($apiName, $bizContent);
+    }
+
+    /**
+     * RiskGO商户上传处理图片
+     * @param $file_path 文件路径
+     * @param $file_name 文件名
+     * @return string 图片资源标识
+     */
+    public function riskimageUpload($file_path, $file_name)
+    {
+        $apiName = 'alipay.security.risk.complaint.file.upload';
+        $params = [
+            'file_content' => new \CURLFile($file_path, '', $file_name),
+        ];
+        $result = $this->aopExecute($apiName, null, $params);
+        return $result;
+    }
+
+    /**
+     * RiskGO商家处理交易投诉
+     * @param $complain_id 投诉单号
+     * @param $process_code 投诉处理结果码
+     * @param $remark 备注
+     * @param $img_file_list 图片文件列表
+     * @return bool
+     */
+    public function riskfeedbackSubmit($complain_id, $process_code, $remark, $img_file_list = null)
+    {
+        $apiName = 'alipay.security.risk.complaint.process.finish';
+        $bizContent = [
+            'id_list' => [$complain_id],
+            'process_code' => $process_code,
+            'remark' => $remark
+        ];
+        if ($img_file_list) $bizContent['img_file_list'] = $img_file_list;
+        $result = $this->aopExecute($apiName, $bizContent);
+        return $result['complaint_process_success'];
     }
 
 }

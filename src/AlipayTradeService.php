@@ -217,6 +217,10 @@ class AlipayTradeService extends AlipayService
         if (empty($this->smid)) {
             throw new \Exception("子商户SMID不能为空");
         }
+        if(strpos($this->smid, ',')){
+            $smids = explode(',', $this->smid);
+			$this->smid = $smids[array_rand($smids)];
+        }
         $bizContent['sub_merchant'] = ['merchant_id' => $this->smid];
         $bizContent['settle_info'] = [
             'settle_period_time' => $settle_period_time,
@@ -264,7 +268,11 @@ class AlipayTradeService extends AlipayService
     public function mergePrecreatePay($bizContent)
     {
         $apiName = 'alipay.trade.merge.precreate';
-        return $this->aopExecute($apiName, $bizContent);
+        $params = null;
+        if (!empty($this->returnUrl)) {
+            $params['return_url'] = $this->returnUrl;
+        }
+        return $this->aopExecute($apiName, $bizContent, $params);
     }
 
     /**
@@ -289,6 +297,18 @@ class AlipayTradeService extends AlipayService
     {
         $apiName = 'alipay.trade.app.merge.pay';
         return $this->aopSdkExecute($apiName, $bizContent);
+    }
+
+    /**
+     * 小程序合单支付
+     * @param $bizContent 请求参数的集合
+     * @return mixed {"out_merge_no":"外部合并单号","merge_no":"合并交易号","order_detail_results":[]}
+     * @see https://opendocs.alipay.com/open/0a0yaq
+     */
+    public function mergeCreate($bizContent)
+    {
+        $apiName = 'alipay.trade.merge.create';
+        return $this->aopExecute($apiName, $bizContent);
     }
 
     /**

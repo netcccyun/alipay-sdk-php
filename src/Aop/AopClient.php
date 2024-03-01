@@ -144,11 +144,12 @@ class AopClient
                 throw new \Exception($errmsg, 0);
             }
             $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
             if ($httpStatusCode == 301 || $httpStatusCode == 302) {
                 $redirect_url = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+                curl_close($ch);
                 return $redirect_url;
             } elseif ($httpStatusCode == 200) {
+                curl_close($ch);
                 $response = mb_convert_encoding($response, 'UTF-8', 'GB2312');
                 if(preg_match('/<div\s+class="Todo">([^<]+)<\/div>/i', $response, $matchers)) {
                     throw new \Exception($matchers[1]);

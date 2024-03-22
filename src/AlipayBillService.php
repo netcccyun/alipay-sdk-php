@@ -104,4 +104,34 @@ class AlipayBillService extends AlipayService
         $apiName = 'alipay.data.bill.balance.query';
         return $this->aopExecute($apiName);
     }
+
+    /**
+     * 申请电子回单
+     * @param $type 申请的类型
+     * @param $key 根据不同业务类型，传入不同参数
+     * @return mixed {"file_id":"文件申请号"}
+     */
+    public function ereceiptApply($type, $key)
+    {
+        $apiName = 'alipay.data.bill.ereceipt.apply';
+        $bizContent = [
+            'type' => $type,
+            'key' => $key,
+        ];
+        return $this->aopExecute($apiName, $bizContent);
+    }
+
+    /**
+     * 查询电子回单状态
+     * @param $file_id 文件申请号
+     * @return mixed {"status":"处理状态","download_url":"下载链接","error_message":"失败原因"}
+     */
+    public function ereceiptQuery($file_id)
+    {
+        $apiName = 'alipay.data.bill.ereceipt.query';
+        $bizContent = [
+            'file_id' => $file_id
+        ];
+        return $this->aopExecute($apiName, $bizContent);
+    }
 }

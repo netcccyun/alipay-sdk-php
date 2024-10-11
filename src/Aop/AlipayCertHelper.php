@@ -5,28 +5,27 @@ namespace Alipay\Aop;
 class AlipayCertHelper
 {
 
-    /**
-     * 从证书中提取序列号
-     * @param $cert
-     * @return string
-     */
-    public static function getCertSN($certPath)
+	/**
+	 * 从证书中提取序列号
+	 * @param string $certPath 证书路径
+	 * @return string
+	 */
+    public static function getCertSN(string $certPath): string
     {
         $cert = file_get_contents($certPath);
         $ssl = openssl_x509_parse($cert);
-        $SN = md5(self::array2string(array_reverse($ssl['issuer'])) . $ssl['serialNumber']);
-        return $SN;
+	    return md5(self::array2string(array_reverse($ssl['issuer'])) . $ssl['serialNumber']);
     }
 
     /**
      * 数组转字符串
-     * @param $array
+     * @param array $array 数组
      * @return string
      */
-    private static function array2string($array)
+    private static function array2string(array $array): string
     {
         $string = [];
-        if ($array && is_array($array)) {
+        if ($array) {
             foreach ($array as $key => $value) {
                 $string[] = $key . '=' . $value;
             }
@@ -36,10 +35,10 @@ class AlipayCertHelper
 
     /**
      * 提取根证书序列号
-     * @param $cert  根证书
+     * @param string $certPath 根证书
      * @return string|null
      */
-    public static function getRootCertSN($certPath)
+    public static function getRootCertSN(string $certPath): ?string
     {
         $cert = file_get_contents($certPath);
         $array = explode("-----END CERTIFICATE-----", $cert);

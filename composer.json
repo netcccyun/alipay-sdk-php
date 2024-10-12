@@ -10,8 +10,13 @@
 	"minimum-stability": "dev",
 	"prefer-stable": true,
 	"require": {
-		"php": ">=7.1"
-	},
+		"php": ">=7.1",
+		"ext-json": "*",
+        "ext-openssl": "*",
+        "ext-curl": "*",
+        "ext-mbstring": "*",
+        "ext-bcmath": "*"
+    },
 	"authors": [
 		{
 			"name": "caihong",

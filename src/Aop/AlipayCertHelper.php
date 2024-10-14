@@ -25,7 +25,7 @@ class AlipayCertHelper
     private static function array2string(array $array): string
     {
         $string = [];
-        if ($array) {
+        if ($array && is_array($array)) {
             foreach ($array as $key => $value) {
                 $string[] = $key . '=' . $value;
             }

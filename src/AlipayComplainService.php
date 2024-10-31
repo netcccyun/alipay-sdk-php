@@ -100,11 +100,11 @@ class AlipayComplainService extends AlipayService
 	 * 商家留言回复
 	 * @param string $complain_event_id 投诉单号
 	 * @param string $reply_content 回复内容
-	 * @param null $reply_images 回复图片(多个用逗号隔开)
+	 * @param string|null $reply_images 回复图片(多个用逗号隔开)
 	 * @return bool
 	 * @throws Exception
 	 */
-    public function replySubmit(string $complain_event_id, string $reply_content, $reply_images = null): bool
+    public function replySubmit(string $complain_event_id, string $reply_content, string $reply_images = null): bool
     {
         $apiName = 'alipay.merchant.tradecomplain.reply.submit';
         $bizContent = [
@@ -120,11 +120,11 @@ class AlipayComplainService extends AlipayService
 	 * 商家补充凭证
 	 * @param string $complain_event_id 投诉单号
 	 * @param string $supplement_content 文字凭证
-	 * @param null $supplement_images 图片凭证(多个用逗号隔开)
+	 * @param string|null $supplement_images 图片凭证(多个用逗号隔开)
 	 * @return bool
 	 * @throws Exception
 	 */
-    public function supplementSubmit(string $complain_event_id, string $supplement_content, $supplement_images = null): bool
+    public function supplementSubmit(string $complain_event_id, string $supplement_content, string $supplement_images = null): bool
     {
         $apiName = 'alipay.merchant.tradecomplain.supplement.submit';
         $bizContent = [
@@ -179,10 +179,10 @@ class AlipayComplainService extends AlipayService
 	 * RiskGO商户上传处理图片
 	 * @param string $file_path 文件路径
 	 * @param string $file_name 文件名
-	 * @return string 图片资源标识
+	 * @return mixed 图片资源标识
 	 * @throws Exception
 	 */
-    public function riskimageUpload(string $file_path, string $file_name): string
+    public function riskimageUpload(string $file_path, string $file_name)
     {
         $apiName = 'alipay.security.risk.complaint.file.upload';
         $params = [
@@ -196,11 +196,11 @@ class AlipayComplainService extends AlipayService
 	 * @param string $complain_id 投诉单号
 	 * @param string $process_code 投诉处理结果码
 	 * @param string $remark 备注
-	 * @param string|null $img_file_list 图片文件列表
+	 * @param array|null $img_file_list 图片文件列表
 	 * @return bool
 	 * @throws Exception
 	 */
-    public function riskfeedbackSubmit(string $complain_id, string $process_code, string $remark, string $img_file_list = null): bool
+    public function riskfeedbackSubmit(string $complain_id, string $process_code, string $remark, array $img_file_list = null): bool
     {
         $apiName = 'alipay.security.risk.complaint.process.finish';
         $bizContent = [

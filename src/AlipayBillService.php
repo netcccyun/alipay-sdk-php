@@ -69,7 +69,7 @@ class AlipayBillService extends AlipayService
 	 */
     public function accountlogQuery(string $start_time, string $end_time, int $page_no = 1, int $page_size = 2000, $bill_user_id = null)
     {
-        $apiName = 'alipay.data.bill.buy.query';
+        $apiName = 'alipay.data.bill.accountlog.query';
         $bizContent = [
             'start_time' => $start_time,
             'end_time' => $end_time,

@@ -129,7 +129,7 @@ class AlipayTransferService extends AlipayService
 	 * @return mixed {"available_amount":"账户可用余额","freeze_amount":"实时冻结余额"}
 	 * @throws Exception
 	 */
-    public function accountQuery(string $alipay_user_id, int $user_type = 0)
+    public function accountQuery(string $alipay_user_id = null, int $user_type = 0)
     {
         $apiName = 'alipay.fund.account.query';
         if($user_type == 1){

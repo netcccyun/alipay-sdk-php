@@ -254,11 +254,12 @@ class AlipayTradeService extends AlipayService
 	 * 互联网直付通确认结算
 	 * @param string $trade_no 支付宝交易号
 	 * @param numeric $settle_amount 结算金额
+     * @param bool $freeze 冻结标识
 	 * @return mixed {"trade_no":"支付宝交易号","out_request_no":"确认结算请求流水号","settle_amount":"结算金额"}
 	 * @throws Exception
 	 * @see https://opendocs.alipay.com/open/direct-payment/gkvknf
 	 */
-    public function settle_confirm(string $trade_no, $settle_amount)
+    public function settle_confirm(string $trade_no, $settle_amount, bool $freeze = false)
     {
         $apiName = 'alipay.trade.settle.confirm';
         $out_request_no = date("YmdHis").rand(11111,99999);
@@ -274,6 +275,9 @@ class AlipayTradeService extends AlipayService
                 ]
             ],
         );
+        if($freeze){
+            $bizContent['extend_params'] = ['royalty_freeze' => 'true'];
+        }
         return $this->aopExecute($apiName, $bizContent);
     }
 

@@ -104,7 +104,7 @@ class AlipayResponse
      *
      * @return string
      */
-    public function getSignData(): string
+    public function getSignData(): ?string
     {
         return $this->signData;
     }

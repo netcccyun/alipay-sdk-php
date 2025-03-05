@@ -13,6 +13,7 @@ class AlipayCertHelper
     public static function getCertSN(string $certPath): string
     {
         $cert = file_get_contents($certPath);
+        $cert = str_replace("\n\n", "\n", $cert);
         $ssl = openssl_x509_parse($cert);
 	    return md5(self::array2string(array_reverse($ssl['issuer'])) . $ssl['serialNumber']);
     }

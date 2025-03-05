@@ -22,15 +22,16 @@ class AlipayOauthService extends AlipayService
     /**
      * 跳转支付宝授权页面
      * @param string $redirect_uri 回调地址
-     * @param $state
+     * @param string $state
+     * @param string $scope 授权范围(auth_base,auth_user)
      * @param bool $is_get_url 是否只返回url
      * @return void|string
      */
-    public function oauth(string $redirect_uri, $state = null, bool $is_get_url = false)
+    public function oauth(string $redirect_uri, $state = null, $scope = 'auth_base', bool $is_get_url = false)
     {
         $param = [
             'app_id' => $this->appId,
-            'scope' => 'auth_base',
+            'scope' => $scope,
             'redirect_uri' => $redirect_uri,
         ];
         if($state) $param['state'] = $state;
@@ -110,11 +111,11 @@ class AlipayOauthService extends AlipayService
     /**
      * 跳转支付宝指定应用授权页面
      * @param string $redirect_uri 回调地址
-     * @param string $app_types 对商家应用的限制类型
+     * @param array $app_types 对商家应用的限制类型
      * @param $state
      * @return array [PC端url, APP端url]
      */
-    public function appOauthAssign(string $redirect_uri, string $app_types, $state = null): array
+    public function appOauthAssign(string $redirect_uri, array $app_types, $state = null): array
     {
         $param = [
             'platformCode' => 'O',
@@ -168,5 +169,30 @@ class AlipayOauthService extends AlipayService
             'app_auth_token' => $appAuthToken,
         ];
         return $this->aopExecute($apiName, $bizContent);
+    }
+
+    public function decryptMobile(array $response, string $key)
+    {
+        if(is_string($response['response'])){
+            /*if(!$this->client->rsaPubilcVerify('"'.$response['response'].'"', $response['sign'])){
+                throw new Exception('手机号码数据验签失败');
+            }*/
+            $data = $this->client->aesDecrypt($response['response'], $key);
+            if(!$data) {
+                throw new Exception('手机号码数据解密失败');
+            }
+            $result = json_decode($data, true);
+            if($result['code'] == '10000'){
+                return $result['mobile'];
+            }elseif(isset($result['subMsg'])){
+                throw new Exception($result['subMsg']);
+            }else{
+                throw new Exception('手机号码数据解密失败 '.$result['msg']);
+            }
+        }elseif(isset($response['response']['subCode']) && isset($response['response']['subMsg'])){
+            throw new Exception('['.$response['response']['subCode'].']'.$response['response']['subMsg']);
+        }else{
+            throw new Exception('手机号码加密数据错误');
+        }
     }
 }

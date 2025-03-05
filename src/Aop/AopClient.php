@@ -386,7 +386,7 @@ class AopClient
 	 * @return bool
 	 * @throws Exception
 	 */
-    protected function rsaPubilcVerify(string $data, string $sign, string $signType = 'RSA2'): bool
+    public function rsaPubilcVerify(string $data, string $sign, string $signType = 'RSA2'): bool
     {
         if ($this->isEmpty($this->rsaPublicKeyFilePath)) {
             $pubKey = "-----BEGIN PUBLIC KEY-----\n" .

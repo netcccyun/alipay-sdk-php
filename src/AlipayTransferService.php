@@ -45,6 +45,7 @@ class AlipayTransferService extends AlipayService
                 'biz_scene' => 'DIRECT_TRANSFER',
                 'order_title' => $payer_show_name, //付款方显示名称
                 'payee_info' => array('identity' => $payee_account, 'identity_type' => $payee_type),
+                'business_params' => json_encode(['payer_show_name_use_alias'=>'true']),
             ];
             if(!empty($payee_real_name))$bizContent['payee_info']['name'] = $payee_real_name; //收款方真实姓名
         } else {

@@ -138,10 +138,8 @@ class AlipayTradeService extends AlipayService
     public function queryResult($trade_no = null, $out_trade_no = null): bool
     {
         $result = $this->query($trade_no, $out_trade_no);
-        if (isset($result['code']) && $result['code'] == '10000') {
-            if ($result['trade_status'] == 'TRADE_SUCCESS' || $result['trade_status'] == 'TRADE_FINISHED' || $result['trade_status'] == 'TRADE_CLOSED') {
-                return true;
-            }
+        if ($result['trade_status'] == 'TRADE_SUCCESS' || $result['trade_status'] == 'TRADE_FINISHED' || $result['trade_status'] == 'TRADE_CLOSED') {
+            return true;
         }
         return false;
     }

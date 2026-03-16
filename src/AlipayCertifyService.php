@@ -19,7 +19,7 @@ class AlipayCertifyService extends AlipayService
     public function __construct(array $config)
     {
         parent::__construct($config);
-        $this->return_url = $config['return_url'];
+        $this->return_url = $config['return_url'] ?? '';
     }
 
 	/**

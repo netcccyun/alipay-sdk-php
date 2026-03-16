@@ -22,11 +22,16 @@ class AlipayRequest
 
     protected $apiMethodName;
 
+    protected $otherParams = [];
+
     public function setOtherParams($params = [])
     {
-        foreach ($params as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->otherParams = array_merge($this->otherParams, $params ?? []);
+    }
+
+    public function getOtherParams(): array
+    {
+        return $this->otherParams;
     }
 
     /**

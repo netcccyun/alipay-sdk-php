@@ -218,7 +218,7 @@ class AopClient
             $sysParams["alipay_root_cert_sn"] = $this->alipayRootCertSN;
         }
         $sysParams['biz_content'] = $request->getBizContent();
-        $sysParams = array_merge($sysParams, get_object_vars($request));
+        $sysParams = array_merge($sysParams, $request->getOtherParams());
         // 转换可能是数组的参数
         foreach ($sysParams as $key => &$param) {
             if (is_array($param) || is_object($param) && !$param instanceof \CURLFile) {

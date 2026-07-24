@@ -371,7 +371,7 @@ class AopClient
         }else{
             openssl_sign($data, $sign, $res);
         }
-        if(is_resource($res)){
+        if(is_resource($res) && version_compare(PHP_VERSION, '8.0.0', '<')){
             openssl_free_key($res);
         }
         return base64_encode($sign);
@@ -405,7 +405,7 @@ class AopClient
         }else{
             $result = openssl_verify($data, base64_decode($sign), $res);
         }
-        if(is_resource($res)){
+        if(is_resource($res) && version_compare(PHP_VERSION, '8.0.0', '<')) {
             openssl_free_key($res);
         }
         return $result === 1;
@@ -431,7 +431,7 @@ class AopClient
 	 * @return bool|string
 	 * @throws Exception
 	 */
-    protected function curl(string $url, array $postFields = null)
+    protected function curl(string $url, ?array $postFields = null)
     {
         $ch = curl_init();
 

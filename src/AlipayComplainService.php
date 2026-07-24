@@ -41,7 +41,7 @@ class AlipayComplainService extends AlipayService
 	 * @return mixed {"page_size":10,"page_num":1,"total_page_num":5,"total_num":55,"trade_complain_infos":[]}
 	 * @throws Exception
 	 */
-    public function batchQuery(string $status = null, string $begin_time = null, string $end_time = null, int $page_num = 1, int $page_size = 10)
+    public function batchQuery(?string $status = null, ?string $begin_time = null, ?string $end_time = null, int $page_num = 1, int $page_size = 10)
     {
         $apiName = 'alipay.merchant.tradecomplain.batchquery';
         $bizContent = [
@@ -83,7 +83,7 @@ class AlipayComplainService extends AlipayService
 	 * @return bool
 	 * @throws Exception
 	 */
-    public function feedbackSubmit(string $complain_event_id, string $feedback_code, string $feedback_content, string $feedback_images = null): bool
+    public function feedbackSubmit(string $complain_event_id, string $feedback_code, string $feedback_content, ?string $feedback_images = null): bool
     {
         $apiName = 'alipay.merchant.tradecomplain.feedback.submit';
         $bizContent = [
@@ -104,7 +104,7 @@ class AlipayComplainService extends AlipayService
 	 * @return bool
 	 * @throws Exception
 	 */
-    public function replySubmit(string $complain_event_id, string $reply_content, string $reply_images = null): bool
+    public function replySubmit(string $complain_event_id, string $reply_content, ?string $reply_images = null): bool
     {
         $apiName = 'alipay.merchant.tradecomplain.reply.submit';
         $bizContent = [
@@ -124,7 +124,7 @@ class AlipayComplainService extends AlipayService
 	 * @return bool
 	 * @throws Exception
 	 */
-    public function supplementSubmit(string $complain_event_id, string $supplement_content, string $supplement_images = null): bool
+    public function supplementSubmit(string $complain_event_id, string $supplement_content, ?string $supplement_images = null): bool
     {
         $apiName = 'alipay.merchant.tradecomplain.supplement.submit';
         $bizContent = [
@@ -162,7 +162,7 @@ class AlipayComplainService extends AlipayService
 	 * @return mixed {"page_size":10,"page_num":1,"total_page_num":5,"total_num":55,"trade_complain_infos":[]}
 	 * @throws Exception
 	 */
-    public function riskbatchQuery(string $status = null, string $begin_time = null, string $end_time = null, int $page_num = 1, int $page_size = 10)
+    public function riskbatchQuery(?string $status = null, ?string $begin_time = null, ?string $end_time = null, int $page_num = 1, int $page_size = 10)
     {
         $apiName = 'alipay.security.risk.complaint.info.batchquery';
         $bizContent = [
@@ -195,18 +195,18 @@ class AlipayComplainService extends AlipayService
 	 * RiskGO商家处理交易投诉
 	 * @param string $complain_id 投诉单号
 	 * @param string $process_code 投诉处理结果码
-	 * @param string $remark 备注
+	 * @param string $reply_content 商家完结留言内容
 	 * @param array|null $img_file_list 图片文件列表
 	 * @return bool
 	 * @throws Exception
 	 */
-    public function riskfeedbackSubmit(string $complain_id, string $process_code, string $remark, array $img_file_list = null): bool
+    public function riskfeedbackSubmit(string $complain_id, string $process_code, string $reply_content, ?array $img_file_list = null): bool
     {
         $apiName = 'alipay.security.risk.complaint.process.finish';
         $bizContent = [
             'id_list' => [$complain_id],
             'process_code' => $process_code,
-            'remark' => $remark
+            'reply_content' => $reply_content
         ];
         if ($img_file_list) $bizContent['img_file_list'] = $img_file_list;
         $result = $this->aopExecute($apiName, $bizContent);

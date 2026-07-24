@@ -96,7 +96,7 @@ class AlipayService
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public function aopExecute(string $apiName, array $bizContent = null, array $params = null)
+	public function aopExecute(string $apiName, ?array $bizContent = null, ?array $params = null)
 	{
 		$request = new AlipayRequest();
 		$request->setApiMethodName($apiName);
@@ -125,7 +125,7 @@ class AlipayService
 	 * @return string
 	 * @throws Exception
 	 */
-	public function aopPageExecute(string $apiName, array $bizContent = null, array $params = null): string
+	public function aopPageExecute(string $apiName, ?array $bizContent = null, ?array $params = null): string
 	{
 		$request = new AlipayRequest();
 		$request->setApiMethodName($apiName);
@@ -162,7 +162,7 @@ class AlipayService
 	 * @param array|null $params 其他公共参数
 	 * @return string
 	 */
-	public function aopSdkExecute(string $apiName, array $bizContent = null, array $params = null): string
+	public function aopSdkExecute(string $apiName, ?array $bizContent = null, ?array $params = null): string
 	{
 		$request = new AlipayRequest();
 		$request->setApiMethodName($apiName);

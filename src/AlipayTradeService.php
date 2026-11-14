@@ -115,7 +115,7 @@ class AlipayTradeService extends AlipayService
 	 * @return mixed {"trade_no":"支付宝交易号","out_trade_no":"商户订单号","open_id":"买家支付宝userid","buyer_logon_id":"买家支付宝账号","trade_status":"TRADE_SUCCESS","total_amount":88.88}
 	 * @throws Exception
 	 */
-    public function query(string $trade_no = null, string $out_trade_no = null)
+    public function query(?string $trade_no = null, ?string $out_trade_no = null)
     {
         $apiName = 'alipay.trade.query';
         $bizContent = [];
@@ -138,7 +138,8 @@ class AlipayTradeService extends AlipayService
     public function queryResult($trade_no = null, $out_trade_no = null): bool
     {
         $result = $this->query($trade_no, $out_trade_no);
-        if ($result['trade_status'] == 'TRADE_SUCCESS' || $result['trade_status'] == 'TRADE_FINISHED' || $result['trade_status'] == 'TRADE_CLOSED') {
+        $trade_status = $result['trade_status'] ?? '';
+        if ($trade_status == 'TRADE_SUCCESS' || $trade_status == 'TRADE_FINISHED' || $trade_status == 'TRADE_CLOSED') {
             return true;
         }
         return false;
@@ -215,6 +216,9 @@ class AlipayTradeService extends AlipayService
     {
         $result = $this->client->verify($params);
         if($result){
+            if (empty($params['trade_no'])) {
+                return false;
+            }
             $result = $this->queryResult($params['trade_no']);
         }
         return $result;

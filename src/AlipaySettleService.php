@@ -87,7 +87,7 @@ class AlipaySettleService extends AlipayService
             'out_request_no' => $out_request_no,
         );
         $result = $this->aopExecute($apiName, $bizContent);
-        return $result['receiver_list'];
+        return $result['receiver_list'] ?? [];
     }
 
 	/**

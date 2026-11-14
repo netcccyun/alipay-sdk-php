@@ -44,7 +44,7 @@ if(!empty($result['user_id'])){
 //发起支付请求
 try{
     $aop = new \Alipay\AlipayTradeService($alipay_config);
-    $result = $aop->qrPay($bizContent);
+    $result = $aop->jsPay($bizContent);
     $alipay_trade_no = $result['trade_no'];
 }catch(Exception $e){
     echo '支付宝下单失败！'.$e->getMessage();
@@ -73,7 +73,7 @@ document.body.addEventListener('touchmove', function (event) {
 	event.preventDefault();
 },{ passive: false });
 
-var tradeNO = '<?php echo $alipay_trade_no?>';
+var tradeNO = <?php echo json_encode($alipay_trade_no)?>;
 
 function Alipayready(callback) {
     // 如果jsbridge已经注入则直接调用

@@ -110,6 +110,20 @@ class AlipayResponse
     }
 
     /**
+     * 验签通过后，使用被签名的原始数据作为返回结果
+     *
+     * @throws \Exception
+     */
+    public function applySignedData()
+    {
+        $data = json_decode((string)$this->signData, true);
+        if (!is_array($data)) {
+            throw new \Exception('返回数据解析失败');
+        }
+        $this->parsed[$this->nodeName] = $data;
+    }
+
+    /**
      * 获取响应内的签名.
      *
      * @return string

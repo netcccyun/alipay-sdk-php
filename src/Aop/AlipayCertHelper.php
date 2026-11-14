@@ -12,9 +12,15 @@ class AlipayCertHelper
 	 */
     public static function getCertSN(string $certPath): string
     {
+        if (!is_file($certPath)) {
+            throw new \InvalidArgumentException('应用公钥证书文件不存在');
+        }
         $cert = file_get_contents($certPath);
         $cert = str_replace("\n\n", "\n", $cert);
         $ssl = openssl_x509_parse($cert);
+        if (!$ssl || !isset($ssl['issuer'], $ssl['serialNumber'])) {
+            throw new \InvalidArgumentException('应用公钥证书解析失败');
+        }
 	    return md5(self::array2string(array_reverse($ssl['issuer'])) . $ssl['serialNumber']);
     }
 
@@ -41,11 +47,18 @@ class AlipayCertHelper
      */
     public static function getRootCertSN(string $certPath): ?string
     {
+        if (!is_file($certPath)) {
+            throw new \InvalidArgumentException('支付宝根证书文件不存在');
+        }
         $cert = file_get_contents($certPath);
         $array = explode("-----END CERTIFICATE-----", $cert);
         $SN = null;
+        $ssl = [];
         for ($i = 0; $i < count($array) - 1; $i++) {
             $ssl[$i] = openssl_x509_parse($array[$i] . "-----END CERTIFICATE-----");
+            if (!$ssl[$i] || !isset($ssl[$i]['issuer'], $ssl[$i]['serialNumber'])) {
+                continue;
+            }
             if(strpos($ssl[$i]['serialNumber'],'0x') === 0){
                 $ssl[$i]['serialNumber'] = self::hex2dec($ssl[$i]['serialNumberHex']);
             }
@@ -67,7 +80,7 @@ class AlipayCertHelper
      */
     private static function hex2dec($hex)
     {
-        $dec = 0;
+        $dec = '0';
         $len = strlen($hex);
         for ($i = 1; $i <= $len; $i++) {
             $dec = bcadd($dec, bcmul(strval(hexdec($hex[$i - 1])), bcpow('16', strval($len - $i))));

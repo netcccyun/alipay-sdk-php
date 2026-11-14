@@ -68,7 +68,9 @@ class AopClient
      */
     public static function aesDecrypt(string $content, string $aesKey): string
     {
-        return openssl_decrypt($content, 'aes-128-cbc', base64_decode($aesKey));
+        // 支付宝AES规则：AES/CBC/PKCS5Padding，IV为16字节的\0，密文为base64编码
+        $result = openssl_decrypt(base64_decode($content), 'aes-128-cbc', base64_decode($aesKey), OPENSSL_RAW_DATA, str_repeat("\0", 16));
+        return $result === false ? '' : $result;
     }
 
     /**
@@ -81,7 +83,10 @@ class AopClient
      */
     public static function aesEncrypt(string $content, string $aesKey): string
     {
-        $result = openssl_encrypt($content, 'aes-128-cbc', base64_decode($aesKey));
+        $result = openssl_encrypt($content, 'aes-128-cbc', base64_decode($aesKey), OPENSSL_RAW_DATA, str_repeat("\0", 16));
+        if ($result === false) {
+            return '';
+        }
         return base64_encode($result);
     }
 
@@ -145,16 +150,12 @@ class AopClient
             $response = curl_exec($ch);
             if (curl_errno($ch) > 0) {
                 $errmsg = curl_error($ch);
-                curl_close($ch);
                 throw new Exception($errmsg, 0);
             }
             $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             if ($httpStatusCode == 301 || $httpStatusCode == 302) {
-                $redirect_url = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
-                curl_close($ch);
-                return $redirect_url;
+                return (string)curl_getinfo($ch, CURLINFO_REDIRECT_URL);
             } elseif ($httpStatusCode == 200) {
-                curl_close($ch);
                 $response = mb_convert_encoding($response, 'UTF-8', 'GB2312');
                 if(preg_match('/<div\s+class="Todo">([^<]+)<\/div>/i', $response, $matchers)) {
                     throw new Exception($matchers[1]);
@@ -165,14 +166,15 @@ class AopClient
         } elseif (strtoupper($httpmethod) == 'GET') {
 	        return $this->gatewayUrl.'?'.http_build_query($params);
         } else {
-            $url = $this->gatewayUrl.'?charset='.$this->charset;
+            $url = htmlspecialchars($this->gatewayUrl.'?charset='.$this->charset, ENT_QUOTES);
 
             $html = "<form id='alipaysubmit' name='alipaysubmit' action='{$url}' method='POST'>";
             foreach ($params as $key => $value) {
                 if ($this->isEmpty($value)) {
                     continue;
                 }
-                $value = htmlentities($value, ENT_QUOTES | ENT_HTML5);
+                $key = htmlspecialchars((string)$key, ENT_QUOTES);
+                $value = htmlentities((string)$value, ENT_QUOTES | ENT_HTML5);
                 $html .= "<input type='hidden' name='{$key}' value='{$value}'/>";
             }
             $html .= "<input type='submit' value='ok' style='display:none;'></form>";
@@ -258,6 +260,8 @@ class AopClient
                 throw new Exception('对返回数据使用支付宝公钥验签失败');
             }
         }
+        // 只信任已验签的那段数据，防止在签名之后追加同名节点覆盖返回结果
+        $response->applySignedData();
     }
 
     /**
@@ -269,7 +273,7 @@ class AopClient
      */
     public function verify($params): bool
     {
-        if (!$params || !isset($params['sign'])) {
+        if (!$params || !is_array($params) || !isset($params['sign']) || !$this->isScalarParams($params)) {
             return false;
         }
         $sign = $params['sign'];
@@ -292,7 +296,7 @@ class AopClient
      */
     public function verifyV2($params): bool
     {
-        if (!$params || !isset($params['sign'])) {
+        if (!$params || !is_array($params) || !isset($params['sign']) || !$this->isScalarParams($params)) {
             return false;
         }
         $sign = $params['sign'];
@@ -335,10 +339,26 @@ class AopClient
 
         $stringToBeSigned = "";
         foreach ($params as $k => $v) {
-            if($v instanceof \CURLFile || $this->isEmpty($v) || substr($v, 0, 1) == '@') continue;
+            if($v instanceof \CURLFile || $this->isEmpty($v)) continue;
             $stringToBeSigned .= "&{$k}={$v}";
         }
 	    return substr($stringToBeSigned, 1);
+    }
+
+    /**
+     * 回调参数必须全部为标量，防止传入数组导致类型错误
+     *
+     * @param array $params
+     * @return bool
+     */
+    protected function isScalarParams(array $params): bool
+    {
+        foreach ($params as $v) {
+            if (!is_null($v) && !is_scalar($v)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 	/**
@@ -414,13 +434,19 @@ class AopClient
     /**
      * 校验某字符串或可被转换为字符串的数据，是否为 NULL 或均为空白字符.
      *
-     * @param string|null $value
+     * @param mixed $value
      *
      * @return bool
      */
-    protected function isEmpty(?string $value): bool
+    protected function isEmpty($value): bool
     {
-        return $value === null || trim($value) === '';
+        if ($value === null) {
+            return true;
+        }
+        if (!is_scalar($value)) {
+            return false;
+        }
+        return trim((string)$value) === '';
     }
 
 	/**
@@ -443,15 +469,10 @@ class AopClient
 
         if (is_array($postFields) && 0 < count($postFields)) {
             $postMultipart = false;
-            foreach ($postFields as &$value) {
+            foreach ($postFields as $value) {
                 if ($value instanceof \CURLFile) {
                     $postMultipart = true;
-                } elseif(substr($value, 0, 1) == '@' && class_exists('CURLFile')) {
-                    $postMultipart = true;
-                    $file = substr($value, 1);
-                    if(file_exists($file)){
-                        $value = new \CURLFile($file);
-                    }
+                    break;
                 }
             }
             curl_setopt($ch, CURLOPT_POST, true);
@@ -466,17 +487,13 @@ class AopClient
 
         if (curl_errno($ch) > 0) {
             $errmsg = curl_error($ch);
-            curl_close($ch);
             throw new Exception($errmsg, 0);
         }
 
         $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if ($httpStatusCode != 200) {
-            curl_close($ch);
-            throw new Exception($response, $httpStatusCode);
+            throw new Exception((string)$response, $httpStatusCode);
         }
-
-        curl_close($ch);
 
         return $response;
     }

@@ -173,7 +173,7 @@ class AlipayOauthService extends AlipayService
 
     public function decryptMobile(array $response, string $key)
     {
-        if(is_string($response['response'])){
+        if(isset($response['response']) && is_string($response['response'])){
             /*if(!$this->client->rsaPubilcVerify('"'.$response['response'].'"', $response['sign'])){
                 throw new Exception('手机号码数据验签失败');
             }*/
@@ -182,12 +182,15 @@ class AlipayOauthService extends AlipayService
                 throw new Exception('手机号码数据解密失败');
             }
             $result = json_decode($data, true);
-            if($result['code'] == '10000'){
+            if(!is_array($result)){
+                throw new Exception('手机号码数据解密失败');
+            }
+            if(isset($result['code']) && $result['code'] == '10000'){
                 return $result['mobile'];
             }elseif(isset($result['subMsg'])){
                 throw new Exception($result['subMsg']);
             }else{
-                throw new Exception('手机号码数据解密失败 '.$result['msg']);
+                throw new Exception('手机号码数据解密失败 '.($result['msg'] ?? ''));
             }
         }elseif(isset($response['response']['subCode']) && isset($response['response']['subMsg'])){
             throw new Exception('['.$response['response']['subCode'].']'.$response['response']['subMsg']);

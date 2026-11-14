@@ -63,7 +63,7 @@ class AlipayComplainService extends AlipayService
 	 */
     public function imageUpload(string $file_path, string $file_name): string
     {
-        $image_type = array_pop(explode('.',$file_name));
+        $image_type = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
         if (empty($image_type)) $image_type = 'png';
         $apiName = 'alipay.merchant.image.upload';
         $params = [
@@ -210,7 +210,7 @@ class AlipayComplainService extends AlipayService
         ];
         if ($img_file_list) $bizContent['img_file_list'] = $img_file_list;
         $result = $this->aopExecute($apiName, $bizContent);
-        return $result['complaint_process_success'];
+        return filter_var($result['complaint_process_success'] ?? false, FILTER_VALIDATE_BOOLEAN);
     }
 
     /**

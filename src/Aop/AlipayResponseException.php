@@ -17,10 +17,10 @@ class AlipayResponseException extends \Exception
         $this->res = $res;
         $this->retCode = $res['code'] ?? null;
         if (isset($res['sub_msg'])) {
-            $this->errCode = $res['sub_code'] ?? null;
-            $message = '['.($res['sub_code'] ?? '').']'.$res['sub_msg'];
+            $this->errCode = $res['sub_code'];
+            $message = '['.$res['sub_code'].']'.$res['sub_msg'];
         } elseif (isset($res['msg'])) {
-            $message = '['.($res['code'] ?? '').']'.$res['msg'];
+            $message = '['.$res['code'].']'.$res['msg'];
         } else {
             $message = '未知错误';
         }
